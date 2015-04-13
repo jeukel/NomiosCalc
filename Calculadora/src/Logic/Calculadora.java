@@ -12,6 +12,7 @@ import Datastructs.SimpleList.SimpleList;
  */
 public class Calculadora{
         
+    //Operators (A,B) and Results (C) lists.
     private final SimpleList<Poli> A;
     private final SimpleList<Poli> B;
     private final SimpleList<Poli> C;
@@ -24,16 +25,11 @@ public class Calculadora{
         operator = " ";
     }
     
-    public String getOperator(){
-        return this.operator;
-    }
-    
-    public void resetCount(){
-        this.A.clear();
-        this.B.clear();
-        this.C.clear();
-    }
-    
+    /**
+     * Divide a string into separated elements to set a Poli
+     * @param nomio
+     * @param W 
+     */
     private void dividePoli(String nomio, int W){
         String Num = "";
         String tmp = " ";
@@ -87,6 +83,9 @@ public class Calculadora{
         */
     }
     
+    /**
+     * Prints for the heads of A,B & C lists
+     */
     private void checkHeads(){
         System.out.println("hello");
         if(this.A.getRootData() != null){
@@ -111,32 +110,6 @@ public class Calculadora{
     }
     
     /**
-     * For use with _ operand key.
-     * @param nomio
-     * @param op 
-     */
-    public void setList(String nomio, String op){
-        dividePoli(nomio, 0);
-        this.operator = op;
-    }
-    
-    /**
-     * For use on "=" key.
-     * @param nomio
-     * @return 
-     */
-    public String setList(String nomio){
-        dividePoli(nomio, 1);
-        compare();        
-        return describe();
-    }
-    
-    public String setList(int[] nomio){
-        eval(nomio[0],nomio[1]);        
-        return describe();
-    }
-    
-    /**
      * Return C list (results list) as a string for printing.
      * @return 
      */
@@ -156,21 +129,12 @@ public class Calculadora{
         return result;
     }
     
-    public void compare(){
-       
+    /**
+     * Check for matching 
+     */
+    private void compare(){
+        
         while(this.A.getRootData() != null){
-            Poli paul = new Poli((this.A.getRootData().getA() * -1),
-                                  this.A.getRootData().getX(),
-                                  this.A.getRootData().getY());
-            /**
-            System.out.print("Paul is (besides dead): ");
-            System.out.print(paul.getA());
-            System.out.print(paul.getX());
-            System.out.println(paul.getY());
-            **/
-            
-            this.B.delete(paul);
-           
             switch (this.operator) {
                 case "+":
                     sum();
@@ -189,31 +153,49 @@ public class Calculadora{
             this.A.delete();
         }
     }
-
+    
+    //Deletes "reverse" Polies...
+    private boolean justForSum(){
+        
+            Poli paul = new Poli((this.A.getRootData().getA() * -1),
+                                  this.A.getRootData().getX(),
+                                  this.A.getRootData().getY());
+            /**
+            System.out.print("Paul is (besides dead): ");
+            System.out.print(paul.getA());
+            System.out.print(paul.getX());
+            System.out.println(paul.getY());
+            **/
+            
+            return this.B.delete(paul);
+    }
+    
+    
     private void sum(){
         //Sum
-        SimpleList<Poli> W = new SimpleList<>(this.B);
-        while(W.getRootData() != null){
-            if( (this.A.getRootData().getX() == W.getRootData().getX()) && 
-                (this.A.getRootData().getY() == W.getRootData().getY()) ){
-            
-                int i = this.A.getRootData().getA() + W.getRootData().getA();
-                int j = this.A.getRootData().getX();
-                int k = this.A.getRootData().getY();
-                Poli pu = new Poli(i,j,k);
-                this.C.insert(pu);
+        if(!justForSum()){
+            SimpleList<Poli> W = new SimpleList<>(this.B);        
+            while(W.getRootData() != null){
+                if( (this.A.getRootData().getX() == W.getRootData().getX()) && 
+                    (this.A.getRootData().getY() == W.getRootData().getY()) ){
+
+                    int i = this.A.getRootData().getA() + W.getRootData().getA();
+                    int j = this.A.getRootData().getX();
+                    int k = this.A.getRootData().getY();
+                    Poli pu = new Poli(i,j,k);
+                    this.C.insert(pu);
+                }
+                /**
+                checkHeads();
+                if(W.getRootData() != null){
+                    System.out.print("W is: ");
+                    System.out.print(W.getRootData().getA());
+                    System.out.print(W.getRootData().getX());
+                    System.out.println(W.getRootData().getY());
+                }**/
+                W.delete();            
             }
-            /**
-            checkHeads();
-            if(W.getRootData() != null){
-                System.out.print("W is: ");
-                System.out.print(W.getRootData().getA());
-                System.out.print(W.getRootData().getX());
-                System.out.println(W.getRootData().getY());
-            }**/
-            W.delete();            
-        }
-        
+        }        
     }
     
     private void mult(){
@@ -289,12 +271,59 @@ public class Calculadora{
         Poli pu = new Poli((int)i,0,0);
         this.C.insert(pu);
     }
-
+    
+    //***********************************************************
+    //***********************************************************
+    //******************   Public Methods   *********************
+    //***********************************************************
+    //***********************************************************
+    
+    
     /**
-     * @param args the command line arguments
-     *
-    public static void main(String[] args) {
-        test();
-    }*/
+     * Asks for what operator is for the procedure in question.
+     * @return 
+     */
+    public String getOperator(){
+        return this.operator;
+    }
+    /**
+     * Clear all the list of operator and results.
+     */
+    public void resetCount(){
+        this.A.clear();
+        this.B.clear();
+        this.C.clear();
+    }
+    
+    /**
+     * For use on "=" key.
+     * @param nomio
+     * @return 
+     */
+    public String setList(String nomio){
+        dividePoli(nomio, 1);
+        compare();        
+        return describe();
+    }
+    
+    /**
+     * For use on eval key.
+     * @param nomio
+     * @return 
+     */
+    public String setList(int[] nomio){
+        eval(nomio[0],nomio[1]);        
+        return describe();
+    }
+    
+    /**
+     * For use with _ operand key.
+     * @param nomio
+     * @param op 
+     */
+    public void setList(String nomio, String op){
+        dividePoli(nomio, 0);
+        this.operator = op;
+    }   
     
 }
